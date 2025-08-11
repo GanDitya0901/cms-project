@@ -80,6 +80,14 @@ $routes = [
     "delete-post"=> [
         "controller"=> "AdminController",
         "method"=> "postDelete"
+    ], 
+    "view-post"=> [
+        "controller"=> "GuestController", 
+        "method"=> "showPost"
+    ], 
+    "make-comment"=> [
+        "controller"=> "GuestController", 
+        "method"=> "makeComment"
     ]
 ];
 ?>

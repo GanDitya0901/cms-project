@@ -65,7 +65,7 @@ class Room
         $stmt = $this->pdo->prepare($query);
 
         $data = [
-            "room_type"=> $room_type,
+            ":room_type"=> $room_type,
             ":price"=> $price,
             ":max_capacity"=> $max_cap,
             ":total_available"=> $total_avail, 

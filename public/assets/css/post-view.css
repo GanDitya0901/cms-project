@@ -1,0 +1,100 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Back button */
+.back-btn {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    background: #555;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+.back-btn:hover {
+    background: #333;
+}
+
+/* Post styling */
+.post-title {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+.post-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.post-content {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Comment form */
+.comment-section {
+    margin-top: 40px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+.comment-section h2 {
+    margin-bottom: 15px;
+}
+#commentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#commentForm input,
+#commentForm textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+#commentForm button {
+    background: #3498db;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+#commentForm button:hover {
+    background: #2980b9;
+}
+
+/* Comment list */
+#commentsList {
+    margin-top: 20px;
+}
+.comment {
+    background: #f4f4f4;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+.comment strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #111;
+}

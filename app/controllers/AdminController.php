@@ -1,19 +1,27 @@
 <?php
+
+use Random\Engine\Secure;
 class AdminController extends Controller
 {
-    public function adminDashboard() {
+
+    public function adminDashboard()
+    {
         $user = new User();
         $room = new Room();
         $reservation = new Reservation();
         $post = new Post();
-        
+
         $roomList = $room->getAllRooms();
         $reservationList = $reservation->getReservationsWithData();
         $postList = $post->getAllPosts();
         $userData = $user->getUserById((int) $_SESSION["user_id"]);
 
-        $this->viewWithData("admin/admin-dashboard", ["user"=> $userData, "rooms"=> $roomList, 
-        "reservations"=> $reservationList, "posts" => $postList]);
+        $this->viewWithData("admin/admin-dashboard", [
+            "user" => $userData,
+            "rooms" => $roomList,
+            "reservations" => $reservationList,
+            "posts" => $postList
+        ]);
     }
 
     public function roomCreation()
@@ -90,49 +98,62 @@ class AdminController extends Controller
                         header("location: " . BASE_URL . "/admin-dashboard");
                     }
                 }
-            } catch(PDOException $e) {
-                die("Query failed: ". $e->getMessage());
+            } catch (PDOException $e) {
+                die("Query failed: " . $e->getMessage());
             }
         } else {
             $this->view("layouts/udateRoom-form");
         }
     }
 
-    public function deleteRoom() {
-        if(isset($_GET["room_id"])) {
+    public function deleteRoom()
+    {
+        if (isset($_GET["room_id"])) {
             $room_id = (int) $_GET["room_id"];
             $roomModel = new Room();
 
             try {
                 $roomModel->getRoomById($room_id);
                 $roomModel->deleteRoom($room_id);
-                header("location: ". BASE_URL . "/admin-dashboard");
-            } catch(PDOException $e) {
-                die("Query failed: ". $e->getMessage());
+                header("location: " . BASE_URL . "/admin-dashboard");
+
+                die();
+            } catch (PDOException $e) {
+                die("Query failed: " . $e->getMessage());
             }
         } else {
             $this->view("admin/admin-dashboard");
         }
     }
 
-    public function postCreation() {
-        if($_SERVER["REQUEST_METHOD"] == "POST") {
+    public function postCreation()
+    {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user_id = (int) $_SESSION["user_id"];
             $title = $_POST["title"];
             $body = $_POST["body"];
-            
+            $filename = $_FILES["image"]["name"];
+
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $allowedTypes = array("jpeg", "jpg", "png", "gif");
+            $tempName = $_FILES["image"]["tmp_name"];
+            $targetPath = __DIR__ . "/../../public/assets/uploads/" . $filename;
+
             require_once "../config/config.php";
 
             $newPost = new Post();
 
             try {
-               
-                $newPost->createPost($title, $body, $user_id);
-                header("location: " . BASE_URL . "/admin-dashboard");
+                if (in_array($ext, $allowedTypes)) {
+                    if (move_uploaded_file($tempName, $targetPath)) {
+                        $newPost->createPost($title, $body, $user_id, $filename);
+                        header("location: " . BASE_URL . "/admin-dashboard");
 
-                die();
-            } catch(PDOException $e) {
-                die("Query failed: ". $e->getMessage());
+                        die();
+                    }
+                }
+            } catch (PDOException $e) {
+                die("Query failed: " . $e->getMessage());
             }
 
         } else {
@@ -140,61 +161,221 @@ class AdminController extends Controller
         }
     }
 
-    public function showPost() {
-        if(isset($_GET["post_id"])) {
+    public function showPost()
+    {
+        if (isset($_GET["post_id"])) {
             $post_id = (int) $_GET["post_id"];
 
             $postModel = new Post();
-            $userModel = new User(); 
+            $userModel = new User();
 
             $post = $postModel->getPostById($post_id);
             $user = $userModel->getUserById((int) $_SESSION["user_id"]);
 
-            $this->viewWithData("layouts/updatePost-form", ["post"=> $post, "user"=> $user]);
+            $this->viewWithData("layouts/updatePost-form", ["post" => $post, "user" => $user]);
         }
     }
 
-    public function updatePost() {
-        if($_SERVER["REQUEST_METHOD"] == "POST") {
+    public function updatePost()
+    {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $post_id = (int) $_POST["post_id"];
             $body = $_POST["body"];
             $title = $_POST["title"];
+            $filename = $_FILES["image"]["name"];
+
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $allowedTypes = array('jpeg', 'jpg', 'png', 'gif');
+            $tempName = $_FILES['image']['tmp_name'];
+            $targetPath = __DIR__ . "/../../public/assets/uploads/" . $filename;
 
             require_once "../config/config.php";
 
             $updatePost = new Post();
 
             try {
-                $updatePost->updatePost($title, $body, $post_id);
-                header("location: ". BASE_URL . "/admin-dashboard");
+                if (in_array($ext, $allowedTypes)) {
+                    if (move_uploaded_file($tempName, $targetPath)) {
+                        $updatePost->updatePost($title, $body, $post_id, $filename);
+                        header("location: " . BASE_URL . "/admin-dashboard");
 
-                die();
-            } catch(PDOException $e) {
-                die("Query failed: ". $e->getMessage());
+                        die();
+                    }
+                }
+            } catch (PDOException $e) {
+                die("Query failed: " . $e->getMessage());
             }
         } else {
             $this->view("layouts/admin-dashboard");
         }
     }
 
-    public function postDelete() {
-        if($_GET["post_id"]) {
+   public function postDelete()
+    {
+        if (isset($_GET["post_id"])) {
             $post_id = (int) $_GET["post_id"];
 
-            $post = new Post();
+            $postModel = new Post();
 
             try {
-                $postModel = $post->getPostById($post_id);
-                $postModel->deletePost($post_id);
-                header("location: ". BASE_URL . "admin/admin-dashboard");
+                $postModel->getPostById($post_id);
+                $postModel->postDeletion($post_id);
+                header("location: " . BASE_URL . "/admin-dashboard");
 
                 die();
-            } catch(PDOException $e) {
-                die("Query failed: ". $e->getMessage());
+            } catch (PDOException $e) {
+                die("Query failed: " . $e->getMessage());
             }
 
         } else {
             $this->view("admin/admin-dashboard");
+        }
+    }
+
+    public function pageCreation()
+    {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $title = $_POST["title"];
+            $slug = $_POST["slug"];
+
+            require_once "../config/config.php";
+
+            $newPage = new Page();
+
+            try {
+                $newPage->createPage($title, $slug);
+                header("location: " . BASE_URL . "/");
+
+                die();
+            } catch (PDOException $e) {
+                die("QUery failed: " . $e->getMessage());
+            }
+        } else {
+            $this->view("/");
+        }
+    }
+
+    public function showPage()
+    {
+        if (isset($_GET["page_id"])) {
+            $page_id = (int) $_GET["post_id"];
+
+            $userModel = new User();
+            $pageModel = new Page();
+
+            $user = $userModel->getUserById((int) $_SESSION["user_id"]);
+            $page = $pageModel->getPageById($page_id);
+
+            $this->viewWithData("/", ["user" => $user, "page" => $page]);
+        }
+    }
+
+    public function pageUpdate()
+    {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $title = $_POST["title"];
+            $slug = $_POST["slug"];
+            $post_id = $_POST["post_id"];
+
+            require_once "../config/config.php";
+
+            $updatePage = new Page();
+
+            try {
+                $updatePage->editPage($title, $slug, $post_id);
+                header("location: " . BASE_URL . "/");
+
+                die();
+            } catch (PDOException $e) {
+                die("Query failed: " . $e->getMessage());
+            }
+        } else {
+            $this->view("/");
+        }
+    }
+
+    public function sectionCreation() {
+        if($_SERVER["REQUEST_METHOD"] == "POST") {
+            $section_type = $_POST["section_type"];
+            $position = (int) $_POST["position"];
+            $page_id = (int) $_GET["page_id"];
+
+            $content = json_encode([
+                "heading"=> $_POST["heading"],
+                "body"=> $_POST["body"],
+                "background"=> $_POST["background"]
+            ]);
+
+            require_once "../config/config.php";
+
+            $newSection = new Page_Sections();
+
+            try {
+                $newSection->addSection($section_type, $content, $position, $page_id);
+                header("location: ". BASE_URL . "/");
+
+                die();
+            } catch (PDOException $e) {
+                die("Query failed: ". $e->getMessage());
+            }
+        }
+    }
+
+    public function showSection() {
+        if(isset($_GET["section_id"])) {
+            $section_id = $_GET["section_id"];
+
+            $sectionModel = new Page_Sections();
+            $userModel = new User();
+
+            $section = $sectionModel->getSectionById($section_id);
+            $user = $userModel->getUserById((int) $_SESSION["user_id"]);
+
+            $this->viewWithData("/", ["section"=> $section, "user"=> $user]);
+        }
+    }
+
+    public function updateSection() {
+        if($_SERVER["REQUEST_METHOD"] == "POST") {
+            $section_id = $_POST["section_id"];
+            $section_type = $_POST["section_type"];
+            $position = $_POST["position"];
+            $page_id = $_GET["page_id"];
+
+            $content = json_encode([
+                "heading"=> $_POST["heading"],
+                "body"=> $_POST["body"],
+                "background"=> $_POST["background"],
+            ]);
+
+            require_once "../config/config.php";
+
+            $updateSection = new Page_Sections();
+
+            try {
+                $updateSection->editSection($section_type, $content, $position, $page_id, $section_id);
+                header("location: " . BASE_URL ."/");
+            } catch (PDOException $e) {
+                die("Query failed: ". $e->getMessage());
+            }
+        }
+    }
+
+    public function deleteSection() {
+        if(isset($_GET["section_id"])) {
+            $section_id = $_GET["section_id"];
+
+            $sectionModel = new Page_Sections();
+
+            try {
+                $sectionModel->getSectionById($section_id);
+                $sectionModel->sectionDelete($section_id);
+                header("location: ". BASE_URL ."/");
+
+                die();
+            } catch (PDOException $e) {
+                die("Query failed: ". $e->getMessage());
+            }
         }
     }
 }

@@ -43,7 +43,7 @@
               <td><image src="<?= $imagePath ?>" alt="Room Image"></image></td>
               <td class="actions">
                   <a class='update' href='<?= BASE_URL ?>/updateRoom-form?room_id=<?= $rooms['room_id'] ?>'>Update</a>
-                  <a class='delete' href='<?= BASE_URL ?>/delete-post?room_id=<?= $rooms['room_id'] ?>'>Delete</a>
+                  <a class='delete' href='<?= BASE_URL ?>/delete-room?room_id=<?= $rooms['room_id'] ?>'>Delete</a>
               </td>
             </tr>
           <?php endforeach; ?>
@@ -68,22 +68,22 @@
             <th>Content</th>
             <th>Author</th>
             <th>Created At</th>
-            <th>Updated At</th>
+            <th>Image</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <?php foreach($data["posts"] as $posts): ?>
+          <?php foreach($data["posts"] as $posts): $imagePath = BASE_URL . "/assets/uploads/" . $posts['filename']?>
             <tr>
               <td><?= $posts["post_id"] ?></td>
               <td><?= $posts["title"] ?></td>
               <td><?= $posts["body"] ?></td>
               <td><?= $posts["username"] ?></td>
               <td><?= $posts["created_at"] ?></td>
-              <td><?= $posts["updated_at"] ?></td>
+              <td><image src="<?= $imagePath ?>" alt="Post Image"></image></td>
               <td class="actions">
                   <a class='update' href='<?= BASE_URL ?>/postUpdate-form?post_id=<?= $posts['post_id'] ?>'>Update</a>
-                  <a class='delete' href='<?= BASE_URL ?>/delete-post?post_id<?= $posts['post_id'] ?>'>Delete</a>
+                  <a class='delete' href='<?= BASE_URL ?>/delete-post?post_id=<?= $posts['post_id'] ?>'>Delete</a>
               </td>
             </tr>
           <?php endforeach; ?>
@@ -105,7 +105,7 @@
             <th>Total</th>
             <th>Guest</th>
             <th>Created At</th>
-            <th>Actions</th>
+            <!-- <th>Actions</th> -->
           </tr>
         </thead>
         <tbody>
@@ -118,10 +118,10 @@
               <td><?= $reservations['total'] ?></td>
               <td><?= $reservations['username'] ?></td>
               <td><?= $reservations['created_at'] ?></td>
-              <td class="actions">
-                  <a class='update' href='<?= BASE_URL ?>/updateRoom-form?room_id=<?= $rooms['room_id'] ?>'>Update</a>
-                  <a class='delete' href='<?= BASE_URL ?>/delete-room?room_id=<?= $rooms['room_id'] ?>'>Delete</a>
-              </td>
+              <!-- <td class="actions">
+                  <a class='update'>Update</a>
+                  <a class='delete'>Delete</a>
+              </td> -->
             </tr>
           <?php endforeach; ?>
         </tbody>

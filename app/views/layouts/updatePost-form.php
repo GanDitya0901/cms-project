@@ -12,9 +12,13 @@
 <body>
     <div class="form-container">
         <h2>Post Update</h2>
-        <form action="<?= BASE_URL ?>/update-post" method="post">
+        <form action="<?= BASE_URL ?>/update-post" method="post" enctype="multipart/form-data">
             <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>" required />
             <div class="form-row">
+                <div class="form-group">
+                    <label>Image <span>*</span></label>
+                    <input type="file" name="image" required />
+                </div>
                 <div class="form-group">
                     <label>Title <span>*</span></label>
                     <input type="text" name="title" value="<?= $post['title'] ?>" required />

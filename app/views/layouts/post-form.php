@@ -12,8 +12,12 @@
 <body>
     <div class="form-container">
         <h2>Post Creation</h2>
-        <form action="<?= BASE_URL ?>/createPost-form" method="post">
+        <form action="<?= BASE_URL ?>/createPost-form" method="post" enctype="multipart/form-data">
             <div class="form-row">
+                <div class="form-group">
+                    <label>Image <span>*</span></label>
+                    <input type="file" name="image" required />
+                </div>
                 <div class="form-group">
                     <label>Title <span>*</span></label>
                     <input type="text" name="title" placeholder="Enter the title" required />

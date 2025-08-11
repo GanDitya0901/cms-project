@@ -14,35 +14,37 @@ class Post {
         $this->pdo = $pdo;
     }
 
-    public function createPost(string $title, string $body, int $author_id) {
-        $query = "INSERT INTO posts (title, body, author_id) VALUES (:title, :body, :author_id)";
+    public function createPost(string $title, string $body, int $author_id, string $filename) {
+        $query = "INSERT INTO posts (title, body, author_id, filename) VALUES (:title, :body, :author_id, :filename)";
 
         $stmt = $this->pdo->prepare($query);
 
         $stmt->bindParam(":title", $title);
         $stmt->bindParam(":body", $body);
         $stmt->bindParam(":author_id", $author_id);
+        $stmt->bindParam(":filename", $filename);
 
         $stmt->execute();
     }
 
-    public function updatePost(string $title, string $body, int $post_id) {
+    public function updatePost(string $title, string $body, int $post_id, string $filename) {
         $query = "UPDATE posts SET 
-        title=:title, body=:body WHERE post_id=:post_id";
+        title=:title, body=:body, filename=:filename WHERE post_id=:post_id";
 
         $stmt = $this->pdo->prepare($query);
 
         $data = [
             ":title"=> $title,
             ":body"=> $body, 
-            ":post_id"=> $post_id
+            ":post_id"=> $post_id, 
+            ":filename"=> $filename
         ];
 
         $stmt->execute($data);
 
     }
 
-    public function deletePost(int $post_id) {
+    public function postDeletion(int $post_id) {
         $query = "DELETE FROM posts WHERE post_id=:post_id";
 
         $stmt = $this->pdo->prepare($query);
@@ -53,8 +55,8 @@ class Post {
     }
 
     public function getAllPosts() {
-        $query = "SELECT p.post_id, p.title, p.body, p.created_at, 
-        p.updated_at, u.user_id, u.username FROM posts p 
+        $query = "SELECT p.post_id, p.title, p.body, p.filename, p.created_at, 
+        u.user_id, u.username FROM posts p 
         JOIN users u ON p.author_id = u.user_id 
         ORDER BY p.created_at ASC";
 
@@ -78,7 +80,7 @@ class Post {
     }
 
     public function getAllPostWithComment() {
-        $query = "SELECT p.post_id, p.title, p.body, c.comment_id, c.comment, 
+        $query = "SELECT p.post_id, p.title, p.body, p.filename, c.comment_id, c.comment, 
         c.created_at, u.user_id, u.username FROM posts p
         LEFT JOIN comments c ON c.post_id = p.post_id 
         LEFT JOIN users u ON u.user_id = c.user_id
